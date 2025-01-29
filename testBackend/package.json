@@ -1,0 +1,22 @@
+{
+  "name": "tetstingbackend",
+  "version": "1.0.0",
+  "main": "try.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon try.js",
+    "try": "nodemon try js",
+    "serve": "nodemon server.js",
+    "work": "nodemon work.js",
+    "spend": "nodemon test.js",
+    "newserve": "nodemon newServer.js",
+    "anotherServe": "nodemon anotherServer.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
