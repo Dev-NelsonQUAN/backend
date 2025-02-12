@@ -25,14 +25,14 @@ app.post("/", (req, res) => {
         password,
       });
       res.status(200).json({
-        message: "user created successfully",
+        message: "User created successfully",
         user: { firstName, lastName, email, password },
       });
     } else {
       res.status(400).json({ message: "All field are required" });
     }
   } else {
-    res.status(409).json({ message: "email already exist" });
+    res.status(409).json({ message: "Email already exist" });
   }
 });
 
@@ -43,11 +43,11 @@ app.get("/:id", (req, res) => {
 
   const getUser = users.findIndex((e) => e.id === id);
   if (getUser === -1) {
-    res.status(404).json({ message: "user not found" });
+    res.status(404).json({ message: "User not found" });
   } else {
     res
       .status(200)
-      .json({ message: "user gotten successfully", data: users[getUser] });
+      .json({ message: "User gotten successfully", data: users[getUser] });
   }
 });
 

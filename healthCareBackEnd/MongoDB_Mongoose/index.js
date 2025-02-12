@@ -54,7 +54,7 @@ app.post("/", async (req, res) => {
 
     res.status(201).json({ message: "Book Posted", data: postBook });
   } catch (error) {
-    res.status(500).json({ message: "an error occured", err });
+    res.status(500).json({ message: "An error occured", err });
   }
 });
 
