@@ -24,9 +24,10 @@ const userDBSchema = new mongoose.Schema({
 
 const userDBModel = mongoose.model("myUSers", userDBSchema);
 
-app.get("/users", (req, res) => {
+app.get("/users", async (req, res) => {
   try {
-    res.status(200).json({ message: "All users gotten" });
+    const getAllUsers = await userDBModel.find()
+    res.status(200).json({ message: "All users gotten", getAllUsers });
   } catch (err) {
     res.status(500).json({ message: "An error occurred", err });
   }
@@ -34,13 +35,13 @@ app.get("/users", (req, res) => {
 
 app.get("/get-one/:id", async (req, res) => {
   try {
-    const getAUser = await userDBModel.find(req.params.id);
-    if (!findAUser) {
+    const getAUser = await userDBModel.findById(req.params.id);
+    if (!getAUser) {
       res.status(404).json({ message: "User not found" });
     }
     res.status(200).json({ message: "User gotten", getAUser });
   } catch (err) {
-    res.status(500).json({ message: "Error" });
+    res.status(500).json({ message: "An error", err });
   }
 });
 
@@ -65,20 +66,21 @@ app.post("/login", async (req, res) => {
     const { email, password } = req.body;
     const checkLogin = await userDBModel.findOne({ email });
 
-    if (!checkLogin || checkLogin.password === password) {
-      res.status(200).json({
-        name: checkLogin.name,
-        email: checkLogin.email,
-        _id: checkLogin._id,
-      });
+    if (!checkLogin || checkLogin.password !== password) {
+       res.status(401).json({ message: "invalid email or password" });
     }
+    res.status(200).json({
+      name: checkLogin.name,
+      email: checkLogin.email,
+      _id: checkLogin._id,
+    });
   } catch (err) {
     res
       .status(500)
       .json({
         status: false,
         message: "An error occurred",
-        err: error.message,
+        err: err.message,
       });
   }
 });
