@@ -36,7 +36,7 @@ app.post("/create-user", async (req, res) => {
     const { name, email, password } = req.body;
     const checkEmailExistence = await logUserModel.findOne({ email });
 
-    if (!checkEmailExistence) {
+    if (checkEmailExistence) {
       res.status(409).json({ message: "Email exists" });
     }
 
