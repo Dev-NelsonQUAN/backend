@@ -10,7 +10,7 @@ database()
 const port = PORT6;
 
 app.use(express.json())
-app.use('/api', routes )
+app.use('/api', routes())
 
 app.listen(port, () => {
   console.log(`Listening to http://localhost:${port}`);
