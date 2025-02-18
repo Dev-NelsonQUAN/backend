@@ -2,10 +2,16 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 const app = express();
+const cors = require('cors')
 require("dotenv/config");
 const port = process.env.PORT4;
 
 app.use(express.json());
+app.use(cors({
+  origin: "http://localhost:5174",
+  methods: ["GET", "POST"],
+  credentials: true
+}))
 
 mongoose
   .connect("mongodb://localhost:27017/booksDB")
@@ -31,7 +37,7 @@ app.get("/books", async (req, res) => {
     const getAllBooks = await booksModel.find();
     res
       .status(200)
-      .json({ message: "All books gotten Successfully", getAllBooks });
+      .json({ message: "All books gotten Successfully", data: getAllBooks });
   } catch (err) {
     res.status(500).json({ message: "An error occurred", error: err.message });
   }

@@ -58,13 +58,14 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
     const login = await userModel.findOne({ email });
 
-    if (!login) {
-      return res.status(401).json({ message: "User does not exist" });
+    if (!login || login.password === password) {
+      return res.status(401).json({ message: "Wrong email or password" });
     }
 
     return res.status(200).json({
       message: "Login Successful",
       name: login.name,
+      email: login.email,
       password: login.password,
     });
   } catch (err) {
