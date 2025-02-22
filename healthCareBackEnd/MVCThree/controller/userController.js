@@ -1,12 +1,14 @@
 const taskManagerModel = require("../model/taskManagerModel");
 const bcrypt = require("bcrypt");
 
+// Handle errors
 const handleError = async (res, error) => {
   return res
     .status(500)
     .json({ message: "An error occurred", error: error || error.message });
 };
 
+// Create User
 const register = async (req, res) => {
   try {
     const { userName, email, password } = req.body;
@@ -14,6 +16,12 @@ const register = async (req, res) => {
 
     if (!password || !email) {
       return res.status(400).json({ message: "All fields required" });
+    }
+
+    const findIfUserExists = await taskManagerModel.findOne({ email });
+
+    if (findIfUserExists) {
+      return res.status(409).json({ message: "Email already exists" });
     }
 
     const createUser = await taskManagerModel.create({
@@ -32,6 +40,7 @@ const register = async (req, res) => {
   }
 };
 
+// Get all users
 const getAllUsers = async (req, res) => {
   try {
     const getTheUser = await taskManagerModel.find();
@@ -39,9 +48,12 @@ const getAllUsers = async (req, res) => {
     return res
       .status(200)
       .json({ message: "All users gotten", data: getTheUser });
-  } catch (err) {}
+  } catch (err) {
+    handleError(res, err);
+  }
 };
 
+// Log user in
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -65,31 +77,38 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Create Tasks
 const createTasks = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description } = req.body;
+    const { title, description, completed } = req.body;
     console.log(req.body);
 
     const user = await taskManagerModel.findById(id);
     console.log(user);
 
+    // Check if user exists
     if (!user) {
       return res
         .status(409)
         .json({ message: "User not found, and unable to create tasks" });
     }
 
+    // Check if title and description are inputted for update
+    if (!title && !description) {
+      return res
+        .status(409)
+        .json({ message: "Title and description fields are required" });
+    }
+
     // Create a new task
     const newTask = {
       title: title,
       description: description,
-      completed: false,
+      completed: completed || false,
     };
 
-    console.log("Updated User Document:", user);
-
-    //Push task into arraya and updtae the task array
+    //Push task into array and updtae the task array
     user.task.push(newTask);
     await user.save(); //Save the updated user document
 
@@ -103,29 +122,46 @@ const createTasks = async (req, res) => {
   }
 };
 
+// Update Tasks
 const updateTasks = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id, taskId } = req.params;
     const { title, description, completed } = req.body;
-    const updateTheTask = await taskManagerModel.findByIdAndDelete(
-      id,
-      { title, description, completed },
-      { new: true }
-    );
 
-    if (!updateTheTask) {
-      return res.status(409).json({ message: "No task to delete" });
+    const findUser = await taskManagerModel.findById(id);
+
+    if (!findUser) {
+      return res
+        .status(409)
+        .json({ message: "User does not exist to update task" });
     }
+
+    if (!title && !description) {
+      return res
+        .status(409)
+        .json({ message: "Fields are required for updates" });
+    }
+
+    const updateTaskById = await findUser.task.id(taskId);
+    if (!updateTaskById) {
+      return res.status(409).json({ message: "No task to update" });
+    }
+
+    if (title) updateTaskById.title === title;
+    if (description) updateTaskById.description === description;
+    if (completed) updateTaskById.completed === completed;
+
+    await findUser.save();
 
     return res
       .status(200)
-      .json({ message: "Tasks updated successfully", data: updateTheTask });
+      .json({ message: "Tasks updated successfully", data: findUser });
   } catch (err) {
-    handleError(res, err);
-    // return res.status(500).json({message: ""})
+    handleError(res, err.message);
   }
 };
 
+// Delete tasks
 const deleteTasks = async (req, res) => {
   try {
     const deleteTheTask = await taskManagerModel.findByIdAndDelete(
@@ -138,8 +174,15 @@ const deleteTasks = async (req, res) => {
 
     return res.status(200).json({ message: "Task successfully deleted" });
   } catch (err) {
-    handleError(res, err)
+    handleError(res, err);
   }
 };
 
-module.exports = { register, getAllUsers, loginUser, createTasks, updateTasks, deleteTasks };
+module.exports = {
+  register,
+  getAllUsers,
+  loginUser,
+  createTasks,
+  updateTasks,
+  deleteTasks,
+};
