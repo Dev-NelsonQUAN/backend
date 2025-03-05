@@ -17,7 +17,7 @@ const createUser = async (req, res) => {
 
     return res
       .status(201)
-      .json({ message: "User created successfully", data: user });
+      .json({ message: "User created successfully", data: newUser });
   } catch (err) {
     return res
       .status(500)

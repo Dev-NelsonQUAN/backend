@@ -1,10 +1,11 @@
 const detailsModel = require("../model/detailsModel");
+const userModel = require("../model/model")
 
 const createUserDetails = async (req, res) => {
   try {
     const { userId, age, address } = req.body;
 
-    const getUser = await detailsModel.findById({ userId });
+    const getUser = await userModel.findById(userId)
 
     if (!getUser) {
       return res

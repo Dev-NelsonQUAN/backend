@@ -9,11 +9,12 @@ const userRoute = require("./routes/userRoutes");
 const detailsRoute = require("./routes/detailsRoute");
 
 app.use(morgan("dev"));
+dataBase();
 app.use(express.json());
+
 app.use("/user", userRoute);
 app.use("/details", detailsRoute);
 
-dataBase();
 
 app.listen(port, () => {
   console.log(
