@@ -11,16 +11,26 @@ const handleError = async (res, err) => {
 const registerUser = async (req, res) => {
   try {
     const { userName, email, password } = req.body;
-    const hashPassword = await argon2.hash(password);
 
     if (!userName && !email && !password) {
       return res.status(401).json({ message: "All fields required" });
     }
+    if (!userName) {
+      return res.status(409).json({ message: "Username is required" });
+    }
+    if (!email) {
+      return res.status(409).json({ message: "Email is required" });
+    }
+    if (!password) {
+      return res.status(409).json({ message: "Password is required" });
+    }
 
     const findIfEmailExist = await userBlogModel.findOne({ email });
     if (findIfEmailExist) {
-      return res.status(409).json({ messager: "User already exists" });
+      return res.status(409).json({ message: "User already exists" });
     }
+
+    const hashPassword = await argon2.hash(password);
 
     const createUser = await userBlogModel.create({
       userName,
@@ -30,8 +40,24 @@ const registerUser = async (req, res) => {
     });
 
     return res
-      .status(200)
+      .status(201)
       .json({ message: "User created successfully", data: createUser });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "An error occurred", error: err.message });
+    // handleError(res, err.message, err);
+  }
+};
+
+//Get All user
+const getAllAppsUser = async (req, res) => {
+  try {
+    const getAllUser = await userBlogModel.find();
+
+    return res
+      .status(200)
+      .json({ message: "All users gotten successfully", data: getAllUser });
   } catch (err) {
     handleError(res, err.message);
   }
@@ -43,12 +69,16 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
     const findUser = await userBlogModel.findOne({ email });
 
-    const checkPassword = await argon2.verify(findUser.password, password);
-
-    if (!findUser || !checkPassword) {
+    if (!findUser) {
       return res.status(409).json({
         message: "Invalid Email or password",
       });
+    }
+
+    const checkPassword = await argon2.verify(findUser.password, password);
+
+    if (!checkPassword) {
+      return res.status(409).json({ message: "Invalid Email or Password" });
     }
 
     return res.status(200).json({
@@ -115,7 +145,7 @@ const createBlogForASpecificUser = async (req, res) => {
 };
 
 //Update A Task
-const updateAUserTasks = async (req, res) => {
+const updateAUserBlog = async (req, res) => {
   try {
     const { userId, blogId } = req.params;
     const { title, content, createdAt } = req.body;
@@ -143,12 +173,13 @@ const updateAUserTasks = async (req, res) => {
       update2: checkIfUserExists.content,
     });
   } catch (err) {
-    handleError(res, err.message);
+    // handleError(res, err.message);
+    return res.status(500).json({message: "An error occurred", error: err.message})
   }
 };
 
 // Delete A Task
-const deleteAUserTask = async (req, res) => {
+const deleteAUserBlog = async (req, res) => {
   try {
     const { userId, blogId } = req.params;
     const findTheUser = await userBlogModel.findById(userId);
@@ -160,13 +191,13 @@ const deleteAUserTask = async (req, res) => {
     const getTheIdToDelete = findTheUser.blogs.id(blogId);
 
     if (!getTheIdToDelete) {
-      return res.status(404).json({ message: "no task to delete" });
+      return res.status(404).json({ message: "No blog to delete" });
     }
 
     getTheIdToDelete.deleteOne();
     await findTheUser.save();
 
-    return res.status(200).json({ message: "Task deleted successfully" });
+    return res.status(200).json({ message: "Blog deleted successfully" });
   } catch (err) {
     handleError(res, err.message);
   }
@@ -219,18 +250,21 @@ const deleteAllUser = async (req, res) => {
 
 //When user hits a wrong route
 const handleWrongRoute = async (req, res) => {
-  return res.status(404).json({message: "Route not found, hope you aren't lost?"})
+  return res
+    .status(404)
+    .json({ message: "Route not found, hope you aren't lost?" });
 };
 
 module.exports = {
   registerUser,
+  getAllAppsUser,
   loginUser,
   getAllBlogsForAUser,
   createBlogForASpecificUser,
-  updateAUserTasks,
-  deleteAUserTask,
+  updateAUserBlog,
+  deleteAUserBlog,
   deleteABlogUser,
   getABlogUser,
   deleteAllUser,
-  handleWrongRoute
+  handleWrongRoute,
 };
