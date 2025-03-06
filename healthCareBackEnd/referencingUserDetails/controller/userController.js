@@ -45,4 +45,16 @@ const getUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, getUser };
+const getAll = async (req, res) => {
+  try {
+    const find = await userModel.find().populate("details");
+
+    return res.status(200).json({ message: "All user gotten successfully" , data: find});
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: "An error occurred", error: err.message || err });
+  }
+};
+
+module.exports = { createUser, getUser, getAll };
