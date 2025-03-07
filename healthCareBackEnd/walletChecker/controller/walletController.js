@@ -3,7 +3,7 @@ const modelUser = require("../model/model");
 
 exports.createWallet = async (req, res) => {
   try {
-    const { userId, email, balance, currency } = req.body;
+    const { email, balance, currency } = req.body;
     const createWall = await modelUser.findOne({ email });
 
     if (!createWall) {
@@ -13,15 +13,15 @@ exports.createWallet = async (req, res) => {
       });
     }
 
-    const walletCreate = new walletModel({
-      owner: createWall._id,
+    const walletCreate = await walletModel.create({
+      user: createWall?._id,
       email,
       balance,
       currency,
     });
-
     walletCreate.save();
-    createWall.owner = walletCreate._id;
+    createWall.wallet = walletCreate?._id;
+  
 
     await createWall.save();
 

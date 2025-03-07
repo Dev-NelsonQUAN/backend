@@ -32,7 +32,7 @@ exports.getById = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const getOne = await userModel.findById(userId).populate("wallet");
+    const getOne = await userModel.findById(userId).populate('wallet');
 
     if (!getOne) {
       return res.status(404).json({ message: "User not found" });
