@@ -43,7 +43,7 @@ const updateUserDetails = async (req, res) => {
     // const updateUser = await userModel.findByIdAndUpdate(detailsId);
 
     if (!updateUser) {
-      return res.status(409).json({ message: "Details not found for update" });
+      return res.status(409).json({ message: "Details not found for update" }); 
     }
 
     // if (age) updateUser.age = age;

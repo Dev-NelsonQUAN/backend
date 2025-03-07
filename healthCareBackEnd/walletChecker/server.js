@@ -6,26 +6,15 @@ const port = PORT;
 const dataBase = require("./config/db");
 const morgan = require("morgan");
 const userRoute = require("./routes/userRoutes");
-const profileRoute = require("./routes/profiileRoute");
-const cors = require("cors");
-
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-    credentials: true,
-  })
-);
+const walletRoute = require("./routes/walletRoute");
 
 app.use(morgan("dev"));
-app.use(express.json());
-app.use("/user", userRoute);
-app.use("/profile", profileRoute);
-
-
 dataBase();
+app.use(express.json());
 
-app.use(express.urlencoded({ extended: true }));
+app.use("/user", userRoute);
+app.use("/wallet", walletRoute);
+
 
 app.listen(port, () => {
   console.log(

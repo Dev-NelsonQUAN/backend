@@ -12,7 +12,7 @@ exports.createUser = async (req, res) => {
     const { userName, email, password } = req.body;
 
     if (!userName && !email && !password) {
-      return res.status(400).jsom({ message: "All fields required" });
+      return res.status(400).json({ message: "All fields required" });
     }
 
     const checkIfUserExists = await userModel.findOne({ email });
@@ -42,9 +42,9 @@ exports.getAllUsers = async (req, res) => {
 
     return res
       .status(200)
-      .jsom({ message: "Gotten all users successfully", data: allUsers });
+      .json({ message: "Gotten all users successfully", data: allUsers });
   } catch (err) {
-    handlelError(res, err.message);
+    handleError(res, err.message);
   }
 };
 
